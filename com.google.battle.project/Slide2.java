@@ -1,4 +1,4 @@
-package com.google.battle.project;
+package hashcode;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -6,12 +6,14 @@ import java.util.Set;
 
 import org.apache.commons.lang.SerializationUtils;
 
-public class Slide implements Serializable{
+public class Slide2 implements Serializable{
 
 	public Slide2 preced;
 	public Slide2 suiv;
 	
 	
+	
+	Transition interestTransition;
 	int bestScore = 0;
 	
 	public boolean horizontal = true;
@@ -22,7 +24,7 @@ public class Slide implements Serializable{
 	
 	Set<String> tags = new HashSet<String>();
 	
-	public Slide(Photo photo) {
+	public Slide2(Photo photo) {
 		photo1 = photo;
 		horizontal = photo.horizontal;
 	}
@@ -45,7 +47,7 @@ public class Slide implements Serializable{
 		photo2 = photo;
 	}
 	
-	public void setBestScored(Slide slide) {
+	public void setBestScored(Slide2 slide) {
 //		Set<String> commontags = new HashSet<>();
 //				Collections.copy(commontags, transition.slide1.tags);
 		Slide2 predSlide = (Slide2) SerializationUtils.clone(slide.preced);
@@ -65,7 +67,7 @@ public class Slide implements Serializable{
 	}
 
 
-	public int getScore(Slide2 slide) {
+	private int getScore(Slide2 slide) {
 		Slide2 slideCopyCommon = (Slide2) SerializationUtils.clone(slide);
 		Slide2 slideCopy = (Slide2) SerializationUtils.clone(slide);
 		Slide2 thisCopy = (Slide2) SerializationUtils.clone(this);

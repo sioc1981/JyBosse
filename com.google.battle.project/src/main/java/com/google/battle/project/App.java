@@ -30,7 +30,6 @@ public class App
 	          List<Photo> photos = loadPhotos(file);
 	          
 	          List<Slide> slides = createSlides(photos);
-	          
 	          write(slides, fileIn);
 	        } catch (IOException e) {
 	          System.out.println(e);
@@ -44,11 +43,21 @@ public class App
 		  Slide slide = null;
 		  do {
 			  slide = findNextSlide(photos, photoV);
-			  if(slide != null)
+			  if(slide != null) {
+				  
+				  addSlide(slides, slide);
 				  slides.add(slide);
+			  }
 		  } while (slide != null);
 		  
 		  return slides;
+	}
+	
+	private static void addSlide(List<Slide> slides, Slide slide) {
+		for (Slide s : slides) {
+			slide.setBestScored(s);
+		}
+		slides.add(slide);
 	}
 	private static Slide findNextSlide(List<Photo> photos, Photo photoV) {
 		Slide slide2 = null;
@@ -99,7 +108,25 @@ public class App
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+	}
+	
+	public static int getScore(final Slide s1, final Slide s2 ) {
+		final AtomicInteger onlyS1 = new AtomicInteger();
+		final AtomicInteger common = new AtomicInteger();
+		final AtomicInteger onlyS2 = new AtomicInteger();
+		for (String s : s1.tags) {
+			if(s2.tags.contains(s)) { 
+				common.getAndIncrement();
+			} else {
+				onlyS1.getAndIncrement();
+			}
+		}
+		for (String s : s2.tags) {
+			if(!s1.tags.contains(s)) { 
+				onlyS2.getAndIncrement();
+			} 
+		}
+		return Math.min(Math.min(onlyS1.get(),common.get() ), onlyS2.get());
 	}
 
 }
