@@ -1,10 +1,9 @@
-package com.google.battle.project;
+package com.google.battle.plop;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -33,6 +32,7 @@ public class App
           int count = 0;
           int lineNr = 0;
           boolean skipfirst = true;
+          int vBuffer = -1;
           for (String line : lines) {
         	  if (skipfirst) {
         		  skipfirst = false;
@@ -42,6 +42,15 @@ public class App
         		  sb.append(lineNr);
         		  sb.append("\n");
         		  ++count;
+        	  } else { //V
+        		  if(vBuffer == -1)
+        			  vBuffer = lineNr;
+        		  else {
+        			  sb.append(vBuffer + " " + lineNr);
+            		  sb.append("\n");
+            		  ++count;
+        			  vBuffer = -1;
+        		  }
         	  }
         	  ++lineNr;
           }
