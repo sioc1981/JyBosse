@@ -35,7 +35,7 @@ public class Slide implements Serializable{
 		if(photo1 != null)
 			tags.addAll(photo1.tags);
 		
-		if(photo1 != null)
+		if(photo2 != null)
 			tags.addAll(photo2.tags);
 
 			return tags;

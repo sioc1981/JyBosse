@@ -12,7 +12,7 @@ public class Photo {
 		horizontal = "H".equals(list.get(0));
 		//int tagsCount = Integer.valueOf(list.remove(0));
 		this.index = index;
-		tags  = list.stream().skip(1).collect(Collectors.toList());
+		tags  = list.stream().skip(2).collect(Collectors.toList());
 	}
 	
 	// H or V
@@ -20,4 +20,11 @@ public class Photo {
 	public int index;
 	public List<String> tags;
 	public boolean used = false;
+	public int interestScore = 0;
+	@Override
+	public String toString() {
+		return "Photo [horizontal=" + horizontal + ", index=" + index + ", tags=" + tags + ", used=" + used
+				+ ", interestScore=" + interestScore + "]";
+	}
+	
 }

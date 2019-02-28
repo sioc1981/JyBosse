@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.StreamSupport;
 
 /**
  * Hello world!
@@ -15,12 +19,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class App 
 {
 	private static final String[] fileList = new String [] {
-			"a_example.txt",
+			"a_example.txt"
+			,
 			"b_lovely_landscapes.txt",
 			"c_memorable_moments.txt",
 			"d_pet_pictures.txt",
 			"e_shiny_selfies.txt"
 	};
+	
+	private static HashMap<String,AtomicInteger> interests = new HashMap<String, AtomicInteger>();
     public static void main( String[] args )
     {
     	for (String fileIn : fileList) {
@@ -38,25 +45,30 @@ public class App
 
     }
 	private static List<Slide> createSlides(List<Photo> photos) {
+		int score = 0;
 		List<Slide> slides = new ArrayList<Slide>();
 		  Photo photoV = null;
 		  Slide slide = null;
+		  Slide previousSlide = null;
 		  do {
+			  previousSlide = slide;
 			  slide = findNextSlide(photos, photoV);
 			  if(slide != null) {
-				  
 				  addSlide(slides, slide);
-				  slides.add(slide);
+//				  slides.add(slide);
+				  if(previousSlide != null) {
+					  score += getScore(previousSlide, slide);
+				  }
 			  }
 		  } while (slide != null);
-		  
+		  System.out.println("Score: " + score);
 		  return slides;
 	}
 	
 	private static void addSlide(List<Slide> slides, Slide slide) {
-		for (Slide s : slides) {
-			slide.setBestScored(s);
-		}
+//		for (Slide s : slides) {
+//			slide.setBestScored(s);
+//		}
 		slides.add(slide);
 	}
 	private static Slide findNextSlide(List<Photo> photos, Photo photoV) {
@@ -81,10 +93,12 @@ public class App
 			  if (slide2.photo2 != null) {
 				  photos.remove(slide2.photo2);
 			  }
+			  slide2.getTags();
 		  }
 		  return slide2;
 	}
 	private static List<Photo> loadPhotos(File file) throws IOException {
+		interests.clear();
 		  final AtomicInteger index = new AtomicInteger();
 		  Scanner scanner = new Scanner(file);
 		  scanner.nextLine();
@@ -92,7 +106,12 @@ public class App
 		  while(scanner.hasNextLine()) {
 			  result.add( new Photo(scanner.nextLine(),index.getAndIncrement()));
 		  }
-		  
+		  result.stream().map(p->p.tags).forEach(s -> s.forEach(t -> interests.computeIfAbsent(t, a -> new AtomicInteger()).getAndIncrement()));
+		  System.out.println("interests: " + interests);
+		  StreamSupport.stream(Spliterators.spliterator(result, Spliterator.SIZED), true).forEach(p -> p.interestScore = p.tags.stream().mapToInt(t -> interests.get(t).get()).sum());
+		  System.out.println("Sorting: ");
+		  result.sort( (p1,p2) -> p1.interestScore - p2.interestScore);
+//		  System.out.println("Photos: " + result);
 		  return result;
 	}
 	
@@ -126,6 +145,11 @@ public class App
 				onlyS2.getAndIncrement();
 			} 
 		}
+//		System.out.println(s1.tags);
+//		System.out.println(s2.tags);
+//		System.out.println("onlyS1: " + onlyS1.get());
+//		System.out.println("common: " + common.get());
+//		System.out.println("onlyS2: " + onlyS2.get());
 		return Math.min(Math.min(onlyS1.get(),common.get() ), onlyS2.get());
 	}
 
