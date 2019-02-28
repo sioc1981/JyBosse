@@ -1,4 +1,4 @@
-package com.google.battle.plop;
+package com.google.battle.project;
 
 import java.io.File;
 import java.io.IOException;
