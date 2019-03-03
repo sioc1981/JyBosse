@@ -57,13 +57,13 @@ public class ResultGeneratorTask {
 	    		endTransition.disable();
 				
 	    		endTransition = endSlide.transitions.pollLast();
-	    		sladeB = endTransition.slide2 == startSlide ? endTransition.slide1 : endTransition.slide2;
+	    		sladeB = endTransition.slide2 == endSlide ? endTransition.slide1 : endTransition.slide2;
 //	    		System.out.println("new end transition " + endTransition);
 	    	}
     	}
 
     	if(sladeA != null) {
-//	        if(startingTransition.slide1.photo1.index == 226 || startingTransition.slide2.photo1.index == 226) {
+//	        if(startingTransition.slide1.photo1.index == 343 || startingTransition.slide2.photo1.index == 343) {
 //	        	System.out.println("" +slides.size()/2+ " start Transition :" + startingTransition);
 //	        }
 	    	App.transitions.remove(startingTransition);
@@ -78,8 +78,9 @@ public class ResultGeneratorTask {
 	        initSlides.remove(sladeA);
     	}
     	if(sladeB != null) {
-//	        if(endTransition.slide1.photo1.index == 226 || endTransition.slide2.photo1.index == 226) {
+//	        if(endTransition.slide1.photo1.index == 343 || endTransition.slide2.photo1.index == 343) {
 //	        	System.out.println("" +slides.size()/2+ " end Transition :" + endTransition);
+//	        	System.out.println("" +slides.size()/2+ " sladeB :" + sladeB);
 //	        }
 	        App.transitions.remove(endTransition);
 	        endTransition.disable();
