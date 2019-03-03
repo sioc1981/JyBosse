@@ -1,86 +1,67 @@
 package com.google.battle.project;
 
-import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
-import org.apache.commons.lang.SerializationUtils;
-
-public class Slide implements Serializable{
-
-	public Slide2 preced;
-	public Slide2 suiv;
+public class Slide {
 	
-	
-	int bestScore = 0;
-	
-	public boolean horizontal = true;
+	int interestScore = 0;
 	
 	Photo photo1;
 	Photo photo2;
 	
+	final Set<String> tags = new TreeSet<String>();
 	
-	Set<String> tags = new HashSet<String>();
+	final TreeSet<SlideTransition> transitions = new TreeSet<SlideTransition>();
 	
 	public Slide(Photo photo) {
 		photo1 = photo;
-		horizontal = photo.horizontal;
+		tags.addAll(photo1.tags);
 	}
 
-	public boolean isFull() {
-		return photo1 != null && photo2 != null;
+	public Slide(Photo photo1, Photo photo2) {
+		this.photo1 = photo1;
+		this.photo2 = photo2;
+		tags.addAll(photo1.tags);
+		tags.addAll(photo2.tags);
+	}
+
+	@Override
+	public String toString() {
+		return "Slide [photo1=" + photo1.index + (photo2 == null ? "" : ", photo2=" + photo2.index) + ", tags=" + tags + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((photo1 == null) ? 0 : photo1.hashCode());
+		result = prime * result + ((photo2 == null) ? 0 : photo2.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Slide other = (Slide) obj;
+		if (photo1 == null) {
+			if (other.photo1 != null)
+				return false;
+		} else if (!photo1.equals(other.photo1))
+			return false;
+		if (photo2 == null) {
+			if (other.photo2 != null)
+				return false;
+		} else if (!photo2.equals(other.photo2))
+			return false;
+		return true;
 	}
 	
-	public Set<String> getTags() {
-		if(photo1 != null)
-			tags.addAll(photo1.tags);
-		
-		if(photo2 != null)
-			tags.addAll(photo2.tags);
-
-			return tags;
-		}
-
-	public void addSecondPhoto(Photo photo) {
-		photo2 = photo;
-	}
 	
-	public void setBestScored(Slide slide) {
-//		Set<String> commontags = new HashSet<>();
-//				Collections.copy(commontags, transition.slide1.tags);
-		Slide2 predSlide = (Slide2) SerializationUtils.clone(slide.preced);
-		Slide2 nextSlide = (Slide2) SerializationUtils.clone(slide.suiv);
-		
-		int score1 = getScore(predSlide);
-		if(score1 > bestScore) {
-			bestScore = score1;
-			suiv = slide.preced;
-		}
-		
-		int score2 = getScore(nextSlide);
-		if(score2 > bestScore) {
-			bestScore = score2;
-			preced = slide.suiv;
-		}
-	}
-
-
-	public int getScore(Slide2 slide) {
-		Slide2 slideCopyCommon = (Slide2) SerializationUtils.clone(slide);
-		Slide2 slideCopy = (Slide2) SerializationUtils.clone(slide);
-		Slide2 thisCopy = (Slide2) SerializationUtils.clone(this);
-		
-		slideCopyCommon.tags.retainAll(tags);
-		int common = slideCopyCommon.tags.size();
-		
-		slideCopy.tags.removeAll(slideCopyCommon.tags);
-		int unique = slideCopy.tags.size();
-		
-		thisCopy.tags.removeAll(slideCopyCommon.tags);
-		int thisUnique = thisCopy.tags.size();
-		
-		
-		
-		return Math.min(Math.min(common, unique), thisUnique);
-	}
+	
 }
