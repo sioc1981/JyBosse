@@ -2,6 +2,7 @@ package com.google.battle.project;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Slide {
 	
@@ -12,7 +13,7 @@ public class Slide {
 	
 	final Set<String> tags = new TreeSet<String>();
 	
-	final TreeSet<SlideTransition> transitions = new TreeSet<SlideTransition>();
+	final ConcurrentSkipListSet<SlideTransition> transitions = new ConcurrentSkipListSet<SlideTransition>();
 	
 	public Slide(Photo photo) {
 		photo1 = photo;
