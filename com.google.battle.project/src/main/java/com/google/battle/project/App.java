@@ -106,6 +106,9 @@ public class App
         while(!transitions.isEmpty()) {
         	List<Slide> tmpSlides = new ArrayList<>();
 	        SlideTransition startingTransition = transitions.pollLast();
+	        if(startingTransition.slide1.photo1.index == 226 || startingTransition.slide2.photo1.index == 226) {
+	        	System.out.println("startingTransition :" + startingTransition);
+	        }
 			Slide startSlide = startingTransition.slide1;
 			Slide endSlide = startingTransition.slide2;
 			startingTransition.disable();
@@ -241,8 +244,9 @@ public class App
 			if(score > 0 ) {
 				SlideTransition slideTransition = new SlideTransition(slide, newSlide, score);
 	//			System.out.println("slideTransition " + slideTransition);
-				slide.transitions.add(slideTransition);
-				newSlide.transitions.add(slideTransition);
+				if(!slide.transitions.add(slideTransition)) System.out.println(" cannot add transition in slide " + slide);
+				if(!newSlide.transitions.add(slideTransition)) System.out.println(" cannot add transition in newSlide " + newSlide);
+//				newSlide.transitions.add(slideTransition);
 				transitions.add(slideTransition);
 	//			System.out.println(transitions);
 			}

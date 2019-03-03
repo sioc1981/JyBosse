@@ -35,8 +35,8 @@ public class SlideTransitionGenerator extends RecursiveAction  {
 			int score = App.getScore(slide, newSlide);
 			if(score > 0 ) {
 				SlideTransition slideTransition = new SlideTransition(slide, newSlide, score);
-				slide.transitions.add(slideTransition);
-				newSlide.transitions.add(slideTransition);
+				if(!slide.transitions.add(slideTransition)) System.out.println(" cannot add transition in slide " + slide);
+				if(!newSlide.transitions.add(slideTransition)) System.out.println(" cannot add transition in newSlide " + newSlide);
 				if(!App.transitions.add(slideTransition)) {
 					System.out.println("" +App.transitions.contains(slideTransition) + " cannot add " + slideTransition );
 					
