@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class ResultGeneratorTask {
+	private static final int DUPLICATED_PHOTO_ID = -1;
+
 	/**
 	 * 
 	 */
@@ -49,7 +51,7 @@ public class ResultGeneratorTask {
     	if(endSlide != null && ! endSlide.transitions.isEmpty()) {
 	        endTransition = endSlide.transitions.pollLast();
 	        sladeB = endTransition.slide2 == endSlide ? endTransition.slide1 : endTransition.slide2;
-	        if( sladeB.equals(startSlide)) {
+	        while ( sladeB.equals(startSlide) || sladeB.equals(sladeA)) {
 //	        	System.out.println("ending slide " + startSlide);
 //	        	System.out.println("conflict with start slide " + startSlide);
 //	    		System.out.println("bad end transition " + endTransition);
@@ -63,9 +65,9 @@ public class ResultGeneratorTask {
     	}
 
     	if(sladeA != null) {
-//	        if(startingTransition.slide1.photo1.index == 343 || startingTransition.slide2.photo1.index == 343) {
-//	        	System.out.println("" +slides.size()/2+ " start Transition :" + startingTransition);
-//	        }
+	        if(startingTransition.slide1.photo1.index == DUPLICATED_PHOTO_ID || startingTransition.slide2.photo1.index == DUPLICATED_PHOTO_ID) {
+	        	System.out.println("" +slides.size()/2+ " start Transition :" + startingTransition);
+	        }
 	    	App.transitions.remove(startingTransition);
 			startingTransition.disable();
 			TreeSet<SlideTransition> transitions = new TreeSet<SlideTransition>(startSlide.transitions);
@@ -78,10 +80,10 @@ public class ResultGeneratorTask {
 	        initSlides.remove(sladeA);
     	}
     	if(sladeB != null) {
-//	        if(endTransition.slide1.photo1.index == 343 || endTransition.slide2.photo1.index == 343) {
-//	        	System.out.println("" +slides.size()/2+ " end Transition :" + endTransition);
-//	        	System.out.println("" +slides.size()/2+ " sladeB :" + sladeB);
-//	        }
+	        if(endTransition.slide1.photo1.index == DUPLICATED_PHOTO_ID || endTransition.slide2.photo1.index == DUPLICATED_PHOTO_ID) {
+	        	System.out.println("" +slides.size()/2+ " end Transition :" + endTransition);
+	        	System.out.println("" +slides.size()/2+ " sladeB :" + sladeB);
+	        }
 	        App.transitions.remove(endTransition);
 	        endTransition.disable();
 			TreeSet<SlideTransition> transitions = new TreeSet<SlideTransition>(endSlide.transitions);
