@@ -1,10 +1,10 @@
 package com.google.battle.project;
 
 import java.util.List;
-import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class SlideTransitionGenerator extends RecursiveAction  {
+public class SlideTransitionGenerator extends RecursiveTask<SlideTransition>  {
 
 
 	/**
@@ -27,25 +27,31 @@ public class SlideTransitionGenerator extends RecursiveAction  {
 		
 	}
 
-	protected void compute() {
+	protected SlideTransition compute() {
 //		System.out.println("compute: start:" + start +" limit: " + limit);
 //		System.out.println("compute: " + this);
-		AtomicInteger skipCounter = new AtomicInteger();
+//		AtomicInteger skipCounter = new AtomicInteger();
+		AtomicReference<SlideTransition> best = new AtomicReference<SlideTransition>();
 		slides.stream().skip(start*limit).limit(limit).forEach(slide -> {
 			int score = App.getScore(slide, newSlide);
-			if(score > 0 ) {
-				SlideTransition slideTransition = new SlideTransition(slide, newSlide, score);
-				if(!slide.transitions.add(slideTransition)) System.out.println(" cannot add transition in slide " + slide);
-				if(!newSlide.transitions.add(slideTransition)) System.out.println(" cannot add transition in newSlide " + newSlide);
-				if(!App.transitions.add(slideTransition)) {
-					System.out.println("" +App.transitions.contains(slideTransition) + " cannot add " + slideTransition );
-					
+//			if(score > 0  ) {
+//				SlideTransition slideTransition = new SlideTransition(slide, newSlide, score);
+//				if(!slide.transitions.add(slideTransition)) System.out.println(" cannot add transition in slide " + slide);
+//				if(!newSlide.transitions.add(slideTransition)) System.out.println(" cannot add transition in newSlide " + newSlide);
+//				if(!App.transitions.add(slideTransition)) {
+//					System.out.println("" +App.transitions.contains(slideTransition) + " cannot add " + slideTransition );
+//				}
+				if(score > 0  &&  (best.get() == null || best.get().score < score)) {
+					SlideTransition slideTransition = new SlideTransition(slide, newSlide, score);
+					best.set(slideTransition);
 				}
-			} else
-				skipCounter.incrementAndGet();
+//			} 
+//			else
+//				skipCounter.incrementAndGet();
 		});
 //		System.out.println("skip transition: " + skipCounter.get());
 //		System.out.println("End: start:" + start);
+		return best.get();
    }
 
 	@Override

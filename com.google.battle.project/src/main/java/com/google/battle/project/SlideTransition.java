@@ -67,6 +67,12 @@ public class SlideTransition implements Comparable<SlideTransition> {
 	public void disable() {
 		slide1.transitions.remove(this);
         slide2.transitions.remove(this);
+        slide1.photo1.tags.forEach(t -> App.tags.get(t).remove(slide1));
+        if(slide1.photo2 != null)
+        	slide1.photo2.tags.forEach(t -> App.tags.get(t).remove(slide1));
+        slide2.photo1.tags.forEach(t -> App.tags.get(t).remove(slide2));
+        if(slide2.photo2 != null)
+        	slide2.photo2.tags.forEach(t -> App.tags.get(t).remove(slide2));
 	}
 
 	@Override

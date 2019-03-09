@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-public class Slide {
+public class Slide implements Comparable<Slide> {
 	
 	int interestScore = 0;
 	
@@ -61,6 +61,14 @@ public class Slide {
 		} else if (!photo2.equals(other.photo2))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(Slide o) {
+		int result = photo1.index - o.photo1.index;
+		if(result == 0 && photo2 != null)
+			result = photo2.index - o.photo2.index;
+		return result;
 	}
 	
 	

@@ -2,6 +2,7 @@ package com.google.battle.project;
 
 import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class ResultGeneratorTask {
 	private static final int DUPLICATED_PHOTO_ID = -1;
@@ -29,10 +30,15 @@ public class ResultGeneratorTask {
 
 
 	protected ResultGeneratorTask compute() {
+//		System.out.println("compute");
 		Slide sladeA = null;
 		SlideTransition startingTransition = null;
-    	if(startSlide != null && ! startSlide.transitions.isEmpty()) {
-	    	startingTransition = startSlide.transitions.pollLast();
+    	//if(startSlide != null && ! startSlide.transitions.isEmpty()) {
+	    	//startingTransition = startSlide.transitions.pollLast();
+	    	//startingTransition = startSlide.transitions.pollLast();
+		if(startSlide != null) {
+    	startingTransition = App.findBest(startSlide, startSlide.tags.stream().flatMap(t -> App.tags.get(t).stream()).collect(Collectors.toSet()), true);
+    	if(startingTransition != null ) {
 	    	sladeA = startingTransition.slide2 == startSlide ? startingTransition.slide1 : startingTransition.slide2;
 	    	if(sladeA.equals(endSlide)) {
 //	    		System.out.println("start slide " + startSlide);
@@ -43,13 +49,16 @@ public class ResultGeneratorTask {
 				
 	    		startingTransition = startSlide.transitions.pollLast();
 		    	sladeA = startingTransition.slide2 == startSlide ? startingTransition.slide1 : startingTransition.slide2;
-//		    	System.out.println("new start transition " + startingTransition);
+	    	System.out.println("new start transition " + startingTransition);
 	    	}
     	}
+		}
     	Slide sladeB = null;
     	SlideTransition endTransition = null;
-    	if(endSlide != null && ! endSlide.transitions.isEmpty()) {
-	        endTransition = endSlide.transitions.pollLast();
+    	if(endSlide != null ) {
+//	        endTransition = endSlide.transitions.pollLast();
+        endTransition = App.findBest(endSlide, endSlide.tags.stream().flatMap(t -> App.tags.get(t).stream()).collect(Collectors.toSet()), true);
+        if(endTransition != null) {
 	        sladeB = endTransition.slide2 == endSlide ? endTransition.slide1 : endTransition.slide2;
 	        while ( sladeB.equals(startSlide) || sladeB.equals(sladeA)) {
 //	        	System.out.println("ending slide " + startSlide);
@@ -58,16 +67,17 @@ public class ResultGeneratorTask {
 	    		App.transitions.remove(endTransition);
 	    		endTransition.disable();
 				
-	    		endTransition = endSlide.transitions.pollLast();
+	    		endTransition = App.findBest(endSlide, endSlide.tags.stream().flatMap(t -> App.tags.get(t).stream()).collect(Collectors.toSet()), true);
 	    		sladeB = endTransition.slide2 == endSlide ? endTransition.slide1 : endTransition.slide2;
-//	    		System.out.println("new end transition " + endTransition);
+	    		System.out.println("new end transition " + endTransition);
 	    	}
+    	}
     	}
 
     	if(sladeA != null) {
-	        if(startingTransition.slide1.photo1.index == DUPLICATED_PHOTO_ID || startingTransition.slide2.photo1.index == DUPLICATED_PHOTO_ID) {
-	        	System.out.println("" +slides.size()/2+ " start Transition :" + startingTransition);
-	        }
+//	        if(startingTransition.slide1.photo1.index == DUPLICATED_PHOTO_ID || startingTransition.slide2.photo1.index == DUPLICATED_PHOTO_ID) {
+//	        	System.out.println("" +slides.size()/2+ " start Transition :" + startingTransition);
+//	        }
 	    	App.transitions.remove(startingTransition);
 			startingTransition.disable();
 			TreeSet<SlideTransition> transitions = new TreeSet<SlideTransition>(startSlide.transitions);
@@ -80,10 +90,10 @@ public class ResultGeneratorTask {
 	        initSlides.remove(sladeA);
     	}
     	if(sladeB != null) {
-	        if(endTransition.slide1.photo1.index == DUPLICATED_PHOTO_ID || endTransition.slide2.photo1.index == DUPLICATED_PHOTO_ID) {
-	        	System.out.println("" +slides.size()/2+ " end Transition :" + endTransition);
-	        	System.out.println("" +slides.size()/2+ " sladeB :" + sladeB);
-	        }
+//	        if(endTransition.slide1.photo1.index == DUPLICATED_PHOTO_ID || endTransition.slide2.photo1.index == DUPLICATED_PHOTO_ID) {
+//	        	System.out.println("" +slides.size()/2+ " end Transition :" + endTransition);
+//	        	System.out.println("" +slides.size()/2+ " sladeB :" + sladeB);
+//	        }
 	        App.transitions.remove(endTransition);
 	        endTransition.disable();
 			TreeSet<SlideTransition> transitions = new TreeSet<SlideTransition>(endSlide.transitions);
@@ -100,6 +110,8 @@ public class ResultGeneratorTask {
     	}
     	return null;
    }
+
+
 
 	
 }
