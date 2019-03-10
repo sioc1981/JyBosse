@@ -25,6 +25,9 @@ public class ResultGeneratorTask {
 		this.endSlide = endSlide;
 		this.initSlides = initSlides;
 		this.slides = slides;
+		if(slides.size() % 100 == 0) {
+			System.out.println("slides to process: " + initSlides.size());
+		}
 	}
 
 

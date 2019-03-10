@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -16,6 +17,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * Hello world!
@@ -30,9 +32,9 @@ public class App
 //            ,
 //            "c_memorable_moments.txt"
 //            ,
-//            "d_pet_pictures.txt"
+            "d_pet_pictures.txt"
 //            ,
-            "e_shiny_selfies.txt"
+//            "e_shiny_selfies.txt"
     };
     
     public static int maxPhoto = 0;
@@ -119,8 +121,21 @@ public class App
 				startingTransition.disable();
 				tmpSlides.add(0,startSlide);
 		        initSlides.remove(startSlide);
+		        final int startIndex = startSlide.photo1.index;
+				Set<SlideTransition> transitions = App.transitions.stream().filter(t -> t.slide1.photo1.index == startIndex || t.slide2.photo1.index == startIndex).collect(Collectors.toSet());
+				for (SlideTransition transition : transitions) {
+		        	transition.disable();
+		        	App.transitions.remove(transition);
+				}
 		        tmpSlides.add(endSlide);
 		        initSlides.remove(endSlide);
+		        final int endIndex = endSlide.photo1.index;
+				transitions = App.transitions.stream().filter(t -> t.slide1.photo1.index == endIndex || t.slide2.photo1.index == endIndex).collect(Collectors.toSet());
+				for (SlideTransition transition : transitions) {
+		        	transition.disable();
+		        	App.transitions.remove(transition);
+				}
+
 		        ResultGeneratorTask task = new ResultGeneratorTask(startSlide, endSlide, tmpSlides, initSlides);
 	//	        task.compute();
 		        while (task != null) {
