@@ -107,9 +107,10 @@ public class App
         while(best.get() != null) {
         	System.out.println("start transitions : " + transitions.size() + " at score " + best.get().score);
 	        while(!transitions.isEmpty()) {
+//	        	System.out.println(" Transition removed :" + App.transitions.stream().noneMatch(endTransition -> endTransition.slide1.photo1.index == ResultGeneratorTask.DUPLICATED_PHOTO_ID || endTransition.slide2.photo1.index == ResultGeneratorTask.DUPLICATED_PHOTO_ID));
 	        	final List<Slide> tmpSlides = new ArrayList<>();
 		        SlideTransition startingTransition = transitions.pollLast();
-	//	        System.out.println("best slide : " +startingTransition);
+		        System.out.println("init slide : " +startingTransition);
 	//	        if(startingTransition.slide1.photo1.index == 226 || startingTransition.slide2.photo1.index == 226) {
 	//	        	System.out.println("startingTransition :" + startingTransition);
 	//	        }
@@ -127,12 +128,14 @@ public class App
 	//	        	System.out.println(" while transitions : " + transitions.size());
 		        }
 		        slides.addAll(tmpSlides);
+
 	        }
 	        best.set(null);
 	        System.out.println("remaning slides: " + initSlides.size());
         	final List<Slide> remainSlides = new ArrayList<>();
 	        initSlides.forEach(s -> addSlide(remainSlides, s));
         }
+        System.out.println("remaning slides: " + initSlides.size());
         slides.addAll(initSlides);
         int score = computeScore(slides);
         System.out.println("Score: " + score);
@@ -182,7 +185,7 @@ public class App
 //			}
 //		});
 //		pool.shutdownNow();
-		findBest(newSlide, slides, false);
+		findBestAndInit(newSlide, slides);
 //		
 //		slides.stream().filter(s -> getScore(s, newSlide) > 0).forEach(slide -> {
 //			SlideTransition slideTransition = new SlideTransition(slide, newSlide, getScore(slide, newSlide));
@@ -346,10 +349,8 @@ public class App
 //		return parabolValues;
 //	}
     
-	static SlideTransition findBest(final Slide slide, Collection<Slide> slides, boolean resetBest) {
+	static SlideTransition findBestAndInit(final Slide slide, Collection<Slide> slides) {
 //		System.out.println("What's best for " + slide + " in  " + slides);
-		if(resetBest)
-			App.best.set(null);
 		ForkJoinPool pool = ForkJoinPool.commonPool();
 		int limit = 499;
 		ArrayList<BestSlideTransition> tasks = new ArrayList<BestSlideTransition>();
@@ -369,6 +370,35 @@ public class App
 						App.best.set(sl.first());
 					} else if (App.best.get().score == sl.first().score) {
 						App.transitions.addAll(sl);
+					}
+				}
+			} catch (InterruptedException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+		pool.shutdownNow();
+		return App.best.get();
+	}
+	
+	static SlideTransition findBest(final Slide slide, Collection<Slide> slides) {
+//		System.out.println("What's best for " + slide + " in  " + slides);
+		App.best.set(null);
+		ForkJoinPool pool = ForkJoinPool.commonPool();
+		int limit = 499;
+		ArrayList<BestSlideTransition> tasks = new ArrayList<BestSlideTransition>();
+		for (int i = 0; i*limit  < slides.size(); i++) {
+			BestSlideTransition task = new BestSlideTransition(slide, slides, i, limit);
+			pool.submit(task);
+			tasks.add(task);
+		}
+		
+		tasks.forEach(t -> {
+			try {
+				ConcurrentSkipListSet<SlideTransition> sl = t.get();
+				if(!sl.isEmpty()) {
+					if (App.best.get() == null || App.best.get().score < sl.first().score) {
+						App.best.set(sl.first());
 					}
 				}
 			} catch (InterruptedException | ExecutionException e) {
