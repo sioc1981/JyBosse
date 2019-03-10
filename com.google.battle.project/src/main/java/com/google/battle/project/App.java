@@ -106,6 +106,8 @@ public class App
 //        
 //        slides = parabolaSort(slides);
         List<Slide> slides = new ArrayList<>();
+        
+        boolean aftertFirstInnerIteration = false;
         while(best.get() != null) {
         	System.out.println("start transitions : " + transitions.size() + " at score " + best.get().score);
 	        while(!transitions.isEmpty()) {
@@ -122,19 +124,23 @@ public class App
 				tmpSlides.add(0,startSlide);
 		        initSlides.remove(startSlide);
 		        final int startIndex = startSlide.photo1.index;
-				Set<SlideTransition> transitions = App.transitions.stream().filter(t -> t.slide1.photo1.index == startIndex || t.slide2.photo1.index == startIndex).collect(Collectors.toSet());
-				for (SlideTransition transition : transitions) {
-		        	transition.disable();
-		        	App.transitions.remove(transition);
-				}
+		        if(aftertFirstInnerIteration) {
+					Set<SlideTransition> transitions = App.transitions.stream().filter(t -> t.slide1.photo1.index == startIndex || t.slide2.photo1.index == startIndex).collect(Collectors.toSet());
+					for (SlideTransition transition : transitions) {
+			        	transition.disable();
+			        	App.transitions.remove(transition);
+					}
+		        }
 		        tmpSlides.add(endSlide);
 		        initSlides.remove(endSlide);
 		        final int endIndex = endSlide.photo1.index;
-				transitions = App.transitions.stream().filter(t -> t.slide1.photo1.index == endIndex || t.slide2.photo1.index == endIndex).collect(Collectors.toSet());
-				for (SlideTransition transition : transitions) {
-		        	transition.disable();
-		        	App.transitions.remove(transition);
-				}
+		        if(aftertFirstInnerIteration) {
+		        	Set<SlideTransition> transitions = App.transitions.stream().filter(t -> t.slide1.photo1.index == endIndex || t.slide2.photo1.index == endIndex).collect(Collectors.toSet());
+					for (SlideTransition transition : transitions) {
+			        	transition.disable();
+			        	App.transitions.remove(transition);
+					}
+		        }
 
 		        ResultGeneratorTask task = new ResultGeneratorTask(startSlide, endSlide, tmpSlides, initSlides);
 	//	        task.compute();
@@ -143,7 +149,7 @@ public class App
 	//	        	System.out.println(" while transitions : " + transitions.size());
 		        }
 		        slides.addAll(tmpSlides);
-
+//		        aftertFirstInnerIteration = true;
 	        }
 	        best.set(null);
 	        System.out.println("remaning slides: " + initSlides.size());
@@ -160,7 +166,28 @@ public class App
     }
 
     private static List<Photo> sortVerticalPhotos(List<Photo> photos) {
-		return photos;
+//    	if( true)
+//    		return photos;
+    	
+    	ArrayList<Photo> result = new ArrayList<Photo>();
+    	while(!photos.isEmpty()) {
+    		Photo first = photos.remove(0);
+    		int common = Integer.MAX_VALUE;
+    		int index = -1;
+    		for (int i = 0; i < photos.size(); i++) {
+    			int score = getCommonTag(first, photos.get(i));
+    			if (score == 0) {
+    				index = i;
+    				break;
+    			}
+    			if(score < common) {
+    				index = i;
+    			}
+			}
+    		result.add(first);
+    		result.add(photos.remove(index));
+    	}
+		return result;
 	}
 	private static int computeScore(List<Slide> slides) {
     	int score = 0;
@@ -354,6 +381,15 @@ public class App
     		}
     	}
     	return Math.min(Math.min(s1.tags.size()-common,common), s2.tags.size()-common);
+    }
+    public static int getCommonTag(final Photo s1, final Photo s2 ) {
+    	int common = 0;
+    	for (final String s : s1.tags) {
+    		if(s2.tags.contains(s)) { 
+    			common++;
+    		}
+    	}
+    	return common;
     }
     
 //	private static <T> List<T> parabolaSort(List<T> values) {
